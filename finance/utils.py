@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import inspect
 
 from logbook import Logger
 
@@ -147,6 +148,48 @@ def insert_record(row, account, asset, transaction):
     return Record.create(
         account=account, asset=asset, transaction=transaction, type=type,
         created_at=created_at, category=category, quantity=quantity)
+
+
+def get_arg_index(var_name, func):
+    argspec = inspect.getargspec(func)
+    for index, arg_name in enumerate(argspec.args):
+        if arg_name == var_name:
+            return index
+
+    # FIXME: Something more appropriate?
+    raise IndexError
+
+
+def type_checking(var_name, var_type):
+    """A decorator for type checking. See tests/test_utils.py for example
+    usages.
+    """
+    def type_checking_decorator(func):
+        def wrapper(*args, **kwargs):
+            import pdb; pdb.set_trace()
+            try:
+                arg_index = get_arg_index(var_name, func)
+            except IndexError:
+                raise ValueError(
+                    'Argument \'{}\' does not exist in function {}'.format(
+                        var_name, func))
+
+            # If var_name is a keyword-argument
+            if var_name in kwargs:
+                if not isinstance(kwargs[var_name], var_type):
+                    raise TypeError
+                else:
+                    return
+
+            # Positional arguments always precede keyword arguments,
+            # the following code won't cause IndexError
+            if not isinstance(args[arg_index], var_type):
+                raise TypeError
+
+            func(*args, **kwargs)
+
+        return wrapper
+    return type_checking_decorator
 
 
 class AssetValueImporter(object):

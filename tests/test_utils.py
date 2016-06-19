@@ -4,8 +4,7 @@ import types
 
 import pytest
 
-from finance.utils import (
-    date_range, extract_numbers, parse_date)
+from finance.utils import *  # noqa
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -73,3 +72,79 @@ def test_parse_date():
 
     delta = parse_date(7) - parse_date(2)
     assert delta == timedelta(days=5)
+
+
+def test_get_arg_index():
+    def test(x, y, z):
+        pass
+
+    assert get_arg_index('x', test) == 0
+    assert get_arg_index('y', test) == 1
+    assert get_arg_index('z', test) == 2
+
+    with pytest.raises(IndexError):
+        get_arg_index('w', test)
+
+
+def test_type_checking_int():
+    @type_checking('x', int)
+    def test(x, y, z):
+        pass
+
+    test(1, 2, 3)
+
+    with pytest.raises(TypeError):
+        test('a', 2, 3)
+
+    with pytest.raises(TypeError):
+        test([], 2, 3)
+
+
+def test_type_checking_str():
+    @type_checking('x', str)
+    def test(x, y):
+        pass
+
+    test('a', 2)
+    test('ab', 2)
+
+    with pytest.raises(TypeError):
+        test(b'abc', 2)
+
+    with pytest.raises(TypeError):
+        test(['a', 'b', 'c'], 2)
+
+
+def test_type_checking_2():
+    @type_checking('w', int)
+    def test(x, y):
+        pass
+
+    with pytest.raises(ValueError):
+        test(1, 2)
+
+
+def test_type_checking_call_as_kwargs():
+    @type_checking('x', int)
+    def test(x, y):
+        pass
+
+    test(x=1, y=2)
+
+
+def test_type_checking_mixing_args_and_kwargs():
+    @type_checking('y', int)
+    def test(x, y):
+        pass
+
+    test(1, y=2)
+
+
+def test_type_checking_nested():
+    @type_checking('x', int)
+    @type_checking('y', str)
+    @type_checking('z', float)
+    def test(x, y, z):
+        pass
+
+    test(1, 'a', 3.0)
