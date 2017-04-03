@@ -14,7 +14,8 @@ func main() {
 			Aliases: []string{"s"},
 			Usage:   "Import stock values by reading a CSV file",
 			Action: func(c *cli.Context) error {
-				finance.ReadStockValues()
+				filePath := c.Args().Get(0)
+				finance.ReadStockValues(filePath)
 				return nil
 			},
 		},

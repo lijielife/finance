@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-func ReadStockValues() {
-	f, err := os.Open("./test.csv")
+func ReadStockValues(filePath string) {
+	f, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
