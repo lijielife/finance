@@ -1,4 +1,4 @@
-package main
+package finance
 
 import (
 	"fmt"
@@ -41,7 +41,7 @@ type AssetValue struct {
 	Volume      int64
 }
 
-func main() {
+func Run() {
 	dbUrl, _ := os.LookupEnv("DB_URL")
 
 	fmt.Printf("Connecting to %s...\n", dbUrl)
