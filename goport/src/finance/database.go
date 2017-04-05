@@ -29,8 +29,9 @@ func (u *Granularity) Scan(value interface{}) error {
 func (u Granularity) Value() (driver.Value, error) { return string(u), nil }
 
 type Asset struct {
-	ID   uint64 `gorm:"primary_key"`
-	Name string `sql:"type:varchar(255);"`
+	ID          uint64 `gorm:"primary_key"`
+	Name        string `sql:"type:varchar(255);"`
+	Description string
 }
 
 type AssetValue struct {
@@ -71,9 +72,6 @@ func CreateTables() {
 	// Migrate the schema
 	db.AutoMigrate(&Asset{})
 	db.AutoMigrate(&AssetValue{})
-
-	// Create
-	//db.Create(&Asset{Name: "Test"})
 
 	// Read
 	// var product Product

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"io"
 	"log"
 	"os"
@@ -50,9 +51,27 @@ func ReadStockValues(filePath string, ch chan AssetValue) {
 	}
 }
 
-func ImportStockValues(filePath string) {
+// FIXME: Need to make an abstraction layer for grom.DB to avoid strong binds
+// with the gorm library
+func InsertStockSymbol(db *gorm.DB, symbol string) {
+	// FIXME: Separate the following part into a different function (checking
+	// for an existing Asset record)
+	var asset Asset
+	db.First(&asset, "name = ?", symbol)
+
+	if asset == (Asset{}) {
+		asset := Asset{
+			Name: symbol,
+		}
+		db.Create(&asset)
+	}
+}
+
+func ImportStockValues(filePath string, symbol string) {
 	db := ConnectDatabase()
 	defer db.Close()
+
+	InsertStockSymbol(db, symbol)
 
 	ch := make(chan AssetValue)
 	go ReadStockValues(filePath, ch)
