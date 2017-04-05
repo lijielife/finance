@@ -41,7 +41,7 @@ type AssetValue struct {
 	Volume      int64
 }
 
-func Run() {
+func CreateTables() {
 	dbUrl, _ := os.LookupEnv("DB_URL")
 
 	fmt.Printf("Connecting to %s...\n", dbUrl)
@@ -62,7 +62,7 @@ func Run() {
 	db.AutoMigrate(&AssetValue{})
 
 	// Create
-	db.Create(&Asset{Name: "Test"})
+	//db.Create(&Asset{Name: "Test"})
 
 	// Read
 	// var product Product
