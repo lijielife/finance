@@ -1,6 +1,7 @@
 package finance
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -20,6 +21,12 @@ const (
 	MONTH    Granularity = "1month"
 	YEAR     Granularity = "1year"
 )
+
+func (u *Granularity) Scan(value interface{}) error {
+	*u = Granularity(value.(string))
+	return nil
+}
+func (u Granularity) Value() (driver.Value, error) { return string(u), nil }
 
 type Asset struct {
 	ID   uint64 `gorm:"primary_key"`
