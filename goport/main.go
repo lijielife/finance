@@ -23,7 +23,7 @@ func main() {
 			Usage:   "Import stock values by reading a CSV file",
 			Action: func(c *cli.Context) error {
 				filePath := c.Args().Get(0)
-				finance.ReadStockValues(filePath)
+				finance.ImportStockValues(filePath)
 				return nil
 			},
 		},

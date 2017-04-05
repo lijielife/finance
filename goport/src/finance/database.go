@@ -48,7 +48,7 @@ type AssetValue struct {
 	Volume      int64
 }
 
-func CreateTables() {
+func ConnectDatabase() *gorm.DB {
 	dbUrl, _ := os.LookupEnv("DB_URL")
 
 	fmt.Printf("Connecting to %s...\n", dbUrl)
@@ -58,7 +58,11 @@ func CreateTables() {
 		panic("failed to connect database")
 	}
 
-	defer db.Close()
+	return db
+}
+
+func CreateTables() {
+	db := ConnectDatabase()
 
 	// Any better way to handle this?
 	db.Exec("DROP TYPE IF EXISTS granularity CASCADE")

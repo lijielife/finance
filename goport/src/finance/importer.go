@@ -12,7 +12,9 @@ import (
 	"time"
 )
 
-func ReadStockValues(filePath string) {
+func ReadStockValues(filePath string, ch chan AssetValue) {
+	defer close(ch)
+
 	f, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -36,15 +38,26 @@ func ReadStockValues(filePath string) {
 		close, _ := strconv.ParseFloat(strings.TrimSpace(record[4]), 64)
 		volume, _ := strconv.ParseInt(strings.TrimSpace(record[5]), 10, 64)
 
-		av := AssetValue{
+		ch <- AssetValue{
 			EvaluatedAt: evaluatedAt,
+			Granularity: DAY,
 			Open:        open,
 			High:        high,
 			Low:         low,
 			Close:       close,
 			Volume:      volume,
 		}
+	}
+}
 
-		fmt.Println(av)
+func ImportStockValues(filePath string) {
+	db := ConnectDatabase()
+	defer db.Close()
+
+	ch := make(chan AssetValue)
+	go ReadStockValues(filePath, ch)
+	for v := range ch {
+		fmt.Println("Processing", v)
+		db.Create(&v)
 	}
 }
