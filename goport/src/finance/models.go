@@ -9,6 +9,30 @@ import (
 	"time"
 )
 
+//
+// AccountType
+//
+
+type AccountType string
+
+const (
+	CHECKING    AccountType = "checking"
+	SAVINGS     AccountType = "savings"
+	INVESTMENT  AccountType = "investment"
+	CREDIT_CARD AccountType = "credit_card"
+	VIRTUAL     AccountType = "virtual"
+)
+
+func (u *AccountType) Scan(value interface{}) error {
+	*u = AccountType(value.(string))
+	return nil
+}
+func (u AccountType) Value() (driver.Value, error) { return string(u), nil }
+
+//
+// Granularity
+//
+
 type Granularity string
 
 const (
@@ -27,6 +51,30 @@ func (u *Granularity) Scan(value interface{}) error {
 	return nil
 }
 func (u Granularity) Value() (driver.Value, error) { return string(u), nil }
+
+//
+// RecordType
+//
+
+type RecordType string
+
+const (
+	DEPOSIT            RecordType = "deposit"
+	WITHDRAW           RecordType = "withdraw"
+	BALANCE_ADJUSTMENT RecordType = "balance_adjustment"
+)
+
+func (u *RecordType) Scan(value interface{}) error {
+	*u = RecordType(value.(string))
+	return nil
+}
+func (u RecordType) Value() (driver.Value, error) { return string(u), nil }
+
+///////////////////////////////////////////////////////////////////////////////
+
+type Account struct {
+	Name string
+}
 
 type Asset struct {
 	ID          uint64 `gorm:"primary_key"`
@@ -47,6 +95,17 @@ type AssetValue struct {
 	Low         float64     `sql:"type:decimal(10,4);"`
 	Close       float64     `sql:"type:decimal(10,4);"`
 	Volume      int64
+}
+
+type Record struct {
+	ID        uint64 `gorm:"primary_key"`
+	Account   Account
+	AccountID uint64
+	Asset     Asset
+	AssetID   uint64
+	Type      RecordType `sql:"not null;type:record_type"`
+	CreatedAt time.Time  `sql:"DEFAULT:current_timestamp"`
+	Quantity  int
 }
 
 func ConnectDatabase() *gorm.DB {
@@ -70,19 +129,45 @@ func CreateTables() {
 	db.Exec("CREATE TYPE granularity AS ENUM('1sec', '1min', '5min', '1hour', '1day', '1week', '1month', '1year')")
 
 	// Migrate the schema
+	db.AutoMigrate(&Account{})
 	db.AutoMigrate(&Asset{})
 	db.AutoMigrate(&AssetValue{})
-
-	// Read
-	// var product Product
-	// db.First(&product, 1) // find product with id 1
-	// fmt.Printf("product = %+v\n", product)
-	// db.First(&product, "code = ?", "L1212") // find product with code l1212
-	// fmt.Printf("product = %+v\n", product)
+	db.AutoMigrate(&Record{})
 
 	// // Update - update product's price to 2000
 	// db.Model(&product).Update("Price", 2000)
 
 	// // Delete - delete product
 	// db.Delete(&product)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+func GetAssetByName(db *gorm.DB, name string) Asset {
+	var asset Asset
+	db.First(&asset, "name = ?", name)
+	return asset
+}
+
+func InsertAsset(db *gorm.DB, name string, description string) (Asset, []error) {
+	asset := Asset{
+		Name:        name,
+		Description: description,
+	}
+	res := db.Create(&asset)
+	return asset, res.GetErrors()
+}
+
+func InsertRecord(db *gorm.DB, account Account, asset Asset,
+	recordType RecordType, createdAt time.Time, quantity int) (Record, []error) {
+
+	record := Record{
+		Account:   account,
+		Asset:     asset,
+		Type:      recordType,
+		CreatedAt: createdAt,
+		Quantity:  quantity,
+	}
+	res := db.Create(&record)
+	return record, res.GetErrors()
 }
