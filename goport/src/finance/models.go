@@ -109,7 +109,10 @@ type Record struct {
 }
 
 func ConnectDatabase() *gorm.DB {
-	dbUrl, _ := os.LookupEnv("DB_URL")
+	dbUrl, found := os.LookupEnv("DB_URL")
+	if !found {
+		panic("Could not find an environment variable DB_URL")
+	}
 
 	fmt.Printf("Connecting to %s...\n", dbUrl)
 	db, err := gorm.Open("postgres", dbUrl+"?sslmode=disable")
