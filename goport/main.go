@@ -13,7 +13,7 @@ func main() {
 			Name:  "schema",
 			Usage: "Setup database schema",
 			Action: func(c *cli.Context) error {
-				finance.CreateTables()
+				finance.CreateTables(finance.ConnectDatabase())
 				return nil
 			},
 		},

@@ -121,9 +121,7 @@ func ConnectDatabase() *gorm.DB {
 	return db
 }
 
-func CreateTables() {
-	db := ConnectDatabase()
-
+func CreateTables(db *gorm.DB) {
 	// Any better way to handle this?
 	db.Exec("DROP TYPE IF EXISTS granularity CASCADE")
 	db.Exec("CREATE TYPE granularity AS ENUM('1sec', '1min', '5min', '1hour', '1day', '1week', '1month', '1year')")

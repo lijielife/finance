@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+func TestCreateTables(t *testing.T) {
+	db := ConnectDatabase()
+	CreateTables(db)
+}
+
 func TestInsertAsset(t *testing.T) {
 	db := ConnectDatabase()
 	asset, errors := InsertAsset(db, "KRW", "Korean Won")
