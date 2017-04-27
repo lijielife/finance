@@ -129,6 +129,9 @@ func CreateTables(db *gorm.DB) {
 	db.Exec("DROP TYPE IF EXISTS granularity CASCADE")
 	db.Exec("CREATE TYPE granularity AS ENUM('1sec', '1min', '5min', '1hour', '1day', '1week', '1month', '1year')")
 
+	db.Exec("DROP TYPE IF EXISTS record_type CASCADE")
+	db.Exec("CREATE TYPE record_type AS ENUM('deposit', 'withdraw', 'balance_adjustment')")
+
 	// Migrate the schema
 	db.AutoMigrate(&Account{})
 	db.AutoMigrate(&Asset{})
