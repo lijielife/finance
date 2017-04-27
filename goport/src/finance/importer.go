@@ -69,14 +69,14 @@ func InsertStockSymbol(db *gorm.DB, symbol string) {
 
 func ImportStockValues(filePath string, symbol string) {
 	db := ConnectDatabase()
-	defer db.Close()
+	defer db.Raw.Close()
 
-	InsertStockSymbol(db, symbol)
+	InsertStockSymbol(db.Raw, symbol)
 
 	ch := make(chan AssetValue)
 	go ReadStockValues(filePath, ch)
 	for v := range ch {
 		fmt.Println("Processing", v)
-		db.Create(&v)
+		db.Raw.Create(&v)
 	}
 }

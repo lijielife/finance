@@ -6,14 +6,21 @@ import (
 	"os"
 )
 
+type Env struct {
+	db finance.Datastore
+}
+
 func main() {
+	db := finance.ConnectDatabase()
+	env := &Env{db}
+
 	app := cli.NewApp()
 	app.Commands = []cli.Command{
 		{
 			Name:  "schema",
 			Usage: "Setup database schema",
 			Action: func(c *cli.Context) error {
-				finance.CreateTables(finance.ConnectDatabase())
+				env.db.CreateTables()
 				return nil
 			},
 		},

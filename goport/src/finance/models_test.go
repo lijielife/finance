@@ -7,12 +7,12 @@ import (
 
 func TestCreateTables(t *testing.T) {
 	db := ConnectDatabase()
-	CreateTables(db)
+	db.CreateTables()
 }
 
 func TestInsertAsset(t *testing.T) {
 	db := ConnectDatabase()
-	asset, errors := InsertAsset(db, "KRW", "Korean Won")
+	asset, errors := InsertAsset(db.Raw, "KRW", "Korean Won")
 
 	if len(errors) > 0 {
 		t.Error(errors)
@@ -24,7 +24,7 @@ func TestInsertAsset(t *testing.T) {
 
 func TestGetAssetByName(t *testing.T) {
 	db := ConnectDatabase()
-	asset := GetAssetByName(db, "KRW")
+	asset := db.GetAssetByName("KRW")
 	if asset == (Asset{}) {
 		t.Error("No such asset found")
 	}

@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+type Datastore interface {
+	CreateTables()
+	GetAssetByName(name string) Asset
+}
+
 //
 // AccountType
 //
@@ -97,6 +102,7 @@ type AssetValue struct {
 	Volume      int64
 }
 
+// Record represents a single financial trade
 type Record struct {
 	ID        uint64 `gorm:"primary_key"`
 	Account   Account
@@ -108,7 +114,7 @@ type Record struct {
 	Quantity  int
 }
 
-func ConnectDatabase() *gorm.DB {
+func ConnectDatabase() *DB {
 	dbUrl, found := os.LookupEnv("DB_URL")
 	if !found {
 		panic("Could not find an environment variable DB_URL")
@@ -121,35 +127,39 @@ func ConnectDatabase() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	return db
+	return &DB{db}
 }
 
-func CreateTables(db *gorm.DB) {
+func (db *DB) CreateTables() {
 	// Any better way to handle this?
-	db.Exec("DROP TYPE IF EXISTS granularity CASCADE")
-	db.Exec("CREATE TYPE granularity AS ENUM('1sec', '1min', '5min', '1hour', '1day', '1week', '1month', '1year')")
+	db.Raw.Exec("DROP TYPE IF EXISTS granularity CASCADE")
+	db.Raw.Exec("CREATE TYPE granularity AS ENUM('1sec', '1min', '5min', '1hour', '1day', '1week', '1month', '1year')")
 
-	db.Exec("DROP TYPE IF EXISTS record_type CASCADE")
-	db.Exec("CREATE TYPE record_type AS ENUM('deposit', 'withdraw', 'balance_adjustment')")
+	db.Raw.Exec("DROP TYPE IF EXISTS record_type CASCADE")
+	db.Raw.Exec("CREATE TYPE record_type AS ENUM('deposit', 'withdraw', 'balance_adjustment')")
 
 	// Migrate the schema
-	db.AutoMigrate(&Account{})
-	db.AutoMigrate(&Asset{})
-	db.AutoMigrate(&AssetValue{})
-	db.AutoMigrate(&Record{})
+	db.Raw.AutoMigrate(&Account{})
+	db.Raw.AutoMigrate(&Asset{})
+	db.Raw.AutoMigrate(&AssetValue{})
+	db.Raw.AutoMigrate(&Record{})
 
 	// // Update - update product's price to 2000
-	// db.Model(&product).Update("Price", 2000)
+	// db.Raw.Model(&product).Update("Price", 2000)
 
 	// // Delete - delete product
-	// db.Delete(&product)
+	// db.Raw.Delete(&product)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-func GetAssetByName(db *gorm.DB, name string) Asset {
+type DB struct {
+	Raw *gorm.DB
+}
+
+func (db *DB) GetAssetByName(name string) Asset {
 	var asset Asset
-	db.First(&asset, "name = ?", name)
+	db.Raw.First(&asset, "name = ?", name)
 	return asset
 }
 
