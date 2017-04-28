@@ -12,7 +12,7 @@ func TestCreateTables(t *testing.T) {
 
 func TestInsertAsset(t *testing.T) {
 	db := ConnectDatabase()
-	asset, errors := InsertAsset(db.Raw, "KRW", "Korean Won")
+	asset, errors := db.InsertAsset("KRW", "Korean Won")
 
 	if len(errors) > 0 {
 		t.Error(errors)

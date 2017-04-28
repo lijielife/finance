@@ -12,6 +12,7 @@ import (
 type Datastore interface {
 	CreateTables()
 	GetAssetByName(name string) Asset
+	InsertAsset(name string, description string) (Asset, []error)
 }
 
 //
@@ -114,6 +115,8 @@ type Record struct {
 	Quantity  int
 }
 
+// ConnectDatabase connects to a database and returns a wrapper object
+// containing an instance of `gorm.DB`.
 func ConnectDatabase() *DB {
 	dbUrl, found := os.LookupEnv("DB_URL")
 	if !found {
@@ -130,6 +133,7 @@ func ConnectDatabase() *DB {
 	return &DB{db}
 }
 
+// CreateTables creates all necessary tables.
 func (db *DB) CreateTables() {
 	// Any better way to handle this?
 	db.Raw.Exec("DROP TYPE IF EXISTS granularity CASCADE")
@@ -153,26 +157,28 @@ func (db *DB) CreateTables() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// A wrapper for `gorm.DB` object.
 type DB struct {
 	Raw *gorm.DB
 }
 
+// Returns an `Asset` instance matching the given name.
 func (db *DB) GetAssetByName(name string) Asset {
 	var asset Asset
 	db.Raw.First(&asset, "name = ?", name)
 	return asset
 }
 
-func InsertAsset(db *gorm.DB, name string, description string) (Asset, []error) {
+func (db *DB) InsertAsset(name string, description string) (Asset, []error) {
 	asset := Asset{
 		Name:        name,
 		Description: description,
 	}
-	res := db.Create(&asset)
+	res := db.Raw.Create(&asset)
 	return asset, res.GetErrors()
 }
 
-func InsertRecord(db *gorm.DB, account Account, asset Asset,
+func (db *DB) InsertRecord(account Account, asset Asset,
 	recordType RecordType, createdAt time.Time, quantity int) (Record, []error) {
 
 	record := Record{
@@ -182,6 +188,6 @@ func InsertRecord(db *gorm.DB, account Account, asset Asset,
 		CreatedAt: createdAt,
 		Quantity:  quantity,
 	}
-	res := db.Create(&record)
+	res := db.Raw.Create(&record)
 	return record, res.GetErrors()
 }
