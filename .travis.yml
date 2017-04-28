@@ -17,6 +17,7 @@ env:
     - DB_URL="postgres:///finance"
     - GOROOT="$HOME/go"
     - GOPATH="$(pwd)/goport:$HOME/go"
+    - PATH="$HOME/go/bin:$PATH"
 
 install:
   - pip install -r requirements.txt
@@ -24,13 +25,13 @@ install:
   - pip install -e .
   - curl -O https://storage.googleapis.com/golang/go1.8.1.linux-amd64.tar.gz
   - tar -C $HOME -xzf go1.8.1.linux-amd64.tar.gz
+  - go version
   - go list -f '{{range .Imports}}{{.}} {{end}}' finance | xargs go get
   - go list -f '{{range .TestImports}}{{.}} {{end}}' finance | xargs go get
 
 before_script:
   - psql -c 'CREATE DATABASE finance;' -U postgres
   - finance create_all
-  - go version
 
 script:
   - py.test -v tests --cov finance --cov-report term-missing
