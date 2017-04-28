@@ -79,7 +79,8 @@ func (u RecordType) Value() (driver.Value, error) { return string(u), nil }
 ///////////////////////////////////////////////////////////////////////////////
 
 type Account struct {
-	Name string
+	ID   uint64 `gorm:"primary_key"`
+	Name string `sql:"type:varchar(255);"`
 }
 
 type Asset struct {
@@ -190,4 +191,12 @@ func (db *DB) InsertRecord(account Account, asset Asset,
 	}
 	res := db.Raw.Create(&record)
 	return record, res.GetErrors()
+}
+
+func (db *DB) InsertAccount(name string) (Account, []error) {
+	account := Account{
+		Name: name,
+	}
+	res := db.Raw.Create(&account)
+	return account, res.GetErrors()
 }
