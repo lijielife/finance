@@ -12,6 +12,27 @@ import (
 	"time"
 )
 
+func ReadCSV(filePath string, ch chan []string) {
+	defer close(ch)
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r := csv.NewReader(bufio.NewReader(f))
+	for {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		ch <- row
+	}
+}
+
 func ReadStockValues(filePath string, ch chan AssetValue) {
 	defer close(ch)
 
