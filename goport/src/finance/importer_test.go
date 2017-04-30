@@ -56,6 +56,10 @@ func TestImportRecords(t *testing.T) {
 
 	filePath := "test-data/records.csv"
 
+	db.InsertAccount("Test Account")
+	db.InsertAsset("USD", "US Dollars")
+	db.InsertAsset("AMZN", "Amazon")
+
 	err := ImportRecords(db, filePath)
 	if err != nil {
 		t.Error(err)

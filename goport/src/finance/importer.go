@@ -105,8 +105,14 @@ func ImportRecords(db *DB, filePath string) error {
 		createdAt, _ := time.Parse("2006-01-02", strings.TrimSpace(row[3]))
 		quantity, _ := strconv.ParseInt(strings.TrimSpace(row[4]), 10, 64)
 
-		account := db.GetAccountByName(accountName)
-		asset := db.GetAssetByName(assetName)
+		account, err := db.GetAccountByName(accountName)
+		if err != nil {
+			return err
+		}
+		asset, err := db.GetAssetByName(assetName)
+		if err != nil {
+			return err
+		}
 
 		record := Record{
 			Account:   account,
@@ -115,6 +121,8 @@ func ImportRecords(db *DB, filePath string) error {
 			CreatedAt: createdAt,
 			Quantity:  int(quantity),
 		}
+
+		fmt.Printf("Inserting %v\n", record)
 		res := db.Raw.Create(&record)
 		if res.Error != nil {
 			return res.Error

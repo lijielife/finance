@@ -29,9 +29,12 @@ func TestInsertAsset(t *testing.T) {
 
 func TestGetAssetByName(t *testing.T) {
 	db := ConnectDatabase()
-	asset := db.GetAssetByName("KRW")
+	asset, err := db.GetAssetByName("KRW")
 	if asset == (Asset{}) {
 		t.Error("No such asset found")
+	}
+	if err != nil {
+		t.Error(err)
 	}
 	fmt.Println(asset)
 }

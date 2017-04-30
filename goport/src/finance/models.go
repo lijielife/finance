@@ -2,6 +2,7 @@ package finance
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -164,18 +165,34 @@ type DB struct {
 }
 
 // Returns an `Asset` instance matching the given name.
-func (db *DB) GetAssetByName(name string) Asset {
+func (db *DB) GetAssetByName(name string) (Asset, error) {
 	var asset Asset
+	var err error
+
 	// FIXME: Deal with cases where no matching record found
 	db.Raw.First(&asset, "name = ?", name)
-	return asset
+	if asset == (Asset{}) {
+		// err = &RowNotFoundError{fmt.Sprintf("Account '%s' not found", name)}
+		err = errors.New(fmt.Sprintf("Asset '%s' not found", name))
+	} else {
+		err = nil
+	}
+	return asset, err
 }
 
-func (db *DB) GetAccountByName(name string) Account {
+func (db *DB) GetAccountByName(name string) (Account, error) {
 	var account Account
+	var err error
+
 	// FIXME: Deal with cases where no matching record found
 	db.Raw.First(&account, "name = ?", name)
-	return account
+	if account == (Account{}) {
+		// err = &RowNotFoundError{fmt.Sprintf("Account '%s' not found", name)}
+		err = errors.New(fmt.Sprintf("Account '%s' not found", name))
+	} else {
+		err = nil
+	}
+	return account, err
 }
 
 func (db *DB) InsertAsset(name string, description string) (Asset, []error) {
