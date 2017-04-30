@@ -13,15 +13,14 @@ type Env struct {
 }
 
 func main() {
-	db := finance.ConnectDatabase()
-	env := &Env{db}
-
 	app := cli.NewApp()
 	app.Commands = []cli.Command{
 		{
 			Name:  "schema",
 			Usage: "Setup database schema",
 			Action: func(c *cli.Context) error {
+				db := finance.ConnectDatabase()
+				env := &Env{db}
 				env.db.CreateTables()
 				return nil
 			},
