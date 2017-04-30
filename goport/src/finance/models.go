@@ -80,18 +80,18 @@ func (u RecordType) Value() (driver.Value, error) { return string(u), nil }
 ///////////////////////////////////////////////////////////////////////////////
 
 type Account struct {
-	ID   uint64 `gorm:"primary_key"`
+	ID   uint64 `sql:"AUTO_INCREMENT" gorm:"primary_key"`
 	Name string `sql:"type:varchar(255);"`
 }
 
 type Asset struct {
-	ID          uint64 `gorm:"primary_key"`
+	ID          uint64 `sql:"AUTO_INCREMENT" gorm:"primary_key"`
 	Name        string `sql:"type:varchar(255);"`
 	Description string
 }
 
 type AssetValue struct {
-	ID          uint64 `gorm:"primary_key"`
+	ID          uint64 `sql:"AUTO_INCREMENT" gorm:"primary_key"`
 	Asset       Asset
 	AssetID     uint64
 	BaseAsset   Asset
@@ -107,7 +107,7 @@ type AssetValue struct {
 
 // Record represents a single financial trade
 type Record struct {
-	ID        uint64 `gorm:"primary_key"`
+	ID        uint64 `sql:"AUTO_INCREMENT" gorm:"primary_key"`
 	Account   Account
 	AccountID uint64
 	Asset     Asset
