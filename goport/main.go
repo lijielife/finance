@@ -2,7 +2,9 @@ package main
 
 import (
 	"finance"
+	"fmt"
 	"github.com/urfave/cli"
+	"net/http"
 	"os"
 )
 
@@ -33,6 +35,17 @@ func main() {
 				filePath, symbol := args.Get(0), args.Get(1)
 
 				finance.ImportStockValues(filePath, symbol)
+				return nil
+			},
+		},
+		{
+			Name:  "webserver",
+			Usage: "Run a web server",
+			Action: func(c *cli.Context) error {
+				http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintf(w, "Hello World!")
+				})
+				http.ListenAndServe(":8080", nil)
 				return nil
 			},
 		},
