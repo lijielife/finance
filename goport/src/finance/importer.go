@@ -71,7 +71,7 @@ func ReadStockValues(filePath string, ch chan AssetValue) {
 	}
 }
 
-func ImportAccounts(filePath string) {
+func ImportAccounts(filePath string) error {
 	db := ConnectDatabase()
 	defer db.Raw.Close()
 
@@ -81,15 +81,19 @@ func ImportAccounts(filePath string) {
 		accountID, _ := strconv.ParseUint(strings.TrimSpace(row[0]), 10, 64)
 		name := strings.TrimSpace(row[1])
 
-		fmt.Printf("Account %d %s\n", accountID, name)
+		fmt.Printf("Creating Account{%d, %s}\n", accountID, name)
 
 		account := Account{
 			ID:   accountID,
 			Name: name,
 		}
 
-		db.Raw.Create(&account)
+		res := db.Raw.Create(&account)
+		if res.Error != nil {
+			return res.Error
+		}
 	}
+	return nil
 }
 
 func ImportStockValues(filePath string, symbol string) {

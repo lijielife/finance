@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-func TestImportStockValues(t *testing.T) {
-	ImportStockValues("test-data/MSFT.csv", "MSFT")
-}
-
 func TestReadCSV(t *testing.T) {
 	// TODO: Look for something like @pytest.mark.parametrize
 	files := []string{"accounts", "assets"}
@@ -22,12 +18,25 @@ func TestReadCSV(t *testing.T) {
 	}
 }
 
+func DeleteExistingAccounts(db *DB, filePath string) {
+	ch := make(chan []string)
+	go ReadCSV(filePath, ch)
+	for row := range ch {
+		db.Raw.Delete(Account{}, "id = ?", row[0])
+	}
+}
+
 func TestImportAccounts(t *testing.T) {
 	db := ConnectDatabase()
 	defer db.Raw.Close()
 
 	filePath := "test-data/accounts.csv"
-	ImportAccounts(filePath)
+	DeleteExistingAccounts(db, filePath)
+
+	err := ImportAccounts(filePath)
+	if err != nil {
+		t.Error(err)
+	}
 
 	ch := make(chan []string)
 	go ReadCSV(filePath, ch)

@@ -3,10 +3,15 @@ package finance
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestCreateTables(t *testing.T) {
 	db := ConnectDatabase()
+	db.Raw.DropTable(&Account{})
+	db.Raw.DropTable(&Asset{})
+	db.Raw.DropTable(&AssetValue{})
+	db.Raw.DropTable(&Record{})
 	db.CreateTables()
 }
 
@@ -29,4 +34,14 @@ func TestGetAssetByName(t *testing.T) {
 		t.Error("No such asset found")
 	}
 	fmt.Println(asset)
+}
+
+func TestInsertRecord(t *testing.T) {
+	db := ConnectDatabase()
+	account, err := db.InsertAccount("Default Account")
+	if err != nil {
+		t.Error(err)
+	}
+	asset, _ := db.InsertAsset("NVDA", "")
+	db.InsertRecord(account, asset, DEPOSIT, time.Now(), 10)
 }

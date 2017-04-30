@@ -193,10 +193,10 @@ func (db *DB) InsertRecord(account Account, asset Asset,
 	return record, res.GetErrors()
 }
 
-func (db *DB) InsertAccount(name string) (Account, []error) {
+func (db *DB) InsertAccount(name string) (Account, error) {
 	account := Account{
 		Name: name,
 	}
 	res := db.Raw.Create(&account)
-	return account, res.GetErrors()
+	return account, res.Error
 }
