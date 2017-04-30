@@ -49,3 +49,15 @@ func TestImportAccounts(t *testing.T) {
 		}
 	}
 }
+
+func TestImportRecords(t *testing.T) {
+	db := ConnectDatabase()
+	defer db.Raw.Close()
+
+	filePath := "test-data/records.csv"
+
+	err := ImportRecords(db, filePath)
+	if err != nil {
+		t.Error(err)
+	}
+}

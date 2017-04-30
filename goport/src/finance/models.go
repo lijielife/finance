@@ -166,8 +166,16 @@ type DB struct {
 // Returns an `Asset` instance matching the given name.
 func (db *DB) GetAssetByName(name string) Asset {
 	var asset Asset
+	// FIXME: Deal with cases where no matching record found
 	db.Raw.First(&asset, "name = ?", name)
 	return asset
+}
+
+func (db *DB) GetAccountByName(name string) Account {
+	var account Account
+	// FIXME: Deal with cases where no matching record found
+	db.Raw.First(&account, "name = ?", name)
+	return account
 }
 
 func (db *DB) InsertAsset(name string, description string) (Asset, []error) {

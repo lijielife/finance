@@ -96,7 +96,37 @@ func ImportAccounts(filePath string) error {
 	return nil
 }
 
-func ImportStockValues(filePath string, symbol string) {
+// Imports trading records from a CSV file.
+func ImportRecords(db *DB, filePath string) error {
+	ch := make(chan []string)
+	go ReadCSV(filePath, ch)
+	for row := range ch {
+		// "Test Account","AMZN",DEPOSIT,2017-02-24,1
+		accountName := strings.TrimSpace(row[0])
+		assetName := strings.TrimSpace(row[1])
+		recordType := RecordType(strings.TrimSpace(row[2]))
+		createdAt, _ := time.Parse("2006-01-02", strings.TrimSpace(row[3]))
+		quantity, _ := strconv.ParseInt(strings.TrimSpace(row[4]), 10, 64)
+
+		account := db.GetAccountByName(accountName)
+		asset := db.GetAssetByName(assetName)
+
+		record := Record{
+			Account:   account,
+			Asset:     asset,
+			Type:      recordType,
+			CreatedAt: createdAt,
+			Quantity:  int(quantity),
+		}
+		res := db.Raw.Create(&record)
+		if res.Error != nil {
+			return res.Error
+		}
+	}
+	return nil
+}
+
+func ImportStockValues(filePath string, symbol string) error {
 	db := ConnectDatabase()
 	defer db.Raw.Close()
 
@@ -109,7 +139,10 @@ func ImportStockValues(filePath string, symbol string) {
 	ch := make(chan AssetValue)
 	go ReadStockValues(filePath, ch)
 	for v := range ch {
-		fmt.Println("Processing", v)
-		db.Raw.Create(&v)
+		res := db.Raw.Create(&v)
+		if res.Error != nil {
+			return res.Error
+		}
 	}
+	return nil
 }
