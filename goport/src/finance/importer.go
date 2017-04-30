@@ -71,10 +71,7 @@ func ReadStockValues(filePath string, ch chan AssetValue) {
 	}
 }
 
-func ImportAccounts(filePath string) error {
-	db := ConnectDatabase()
-	defer db.Raw.Close()
-
+func ImportAccounts(db *DB, filePath string) error {
 	ch := make(chan []string)
 	go ReadCSV(filePath, ch)
 	for row := range ch {
@@ -126,10 +123,7 @@ func ImportRecords(db *DB, filePath string) error {
 	return nil
 }
 
-func ImportStockValues(filePath string, symbol string) error {
-	db := ConnectDatabase()
-	defer db.Raw.Close()
-
+func ImportStockValues(db *DB, filePath string, symbol string) error {
 	var asset Asset
 	db.Raw.First(&asset, "name = ?", symbol)
 	if asset == (Asset{}) {

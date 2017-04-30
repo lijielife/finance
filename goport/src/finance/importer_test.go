@@ -33,7 +33,7 @@ func TestImportAccounts(t *testing.T) {
 	filePath := "test-data/accounts.csv"
 	DeleteExistingAccounts(db, filePath)
 
-	err := ImportAccounts(filePath)
+	err := ImportAccounts(db, filePath)
 	if err != nil {
 		t.Error(err)
 	}

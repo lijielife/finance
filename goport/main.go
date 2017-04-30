@@ -20,6 +20,8 @@ func main() {
 			Usage: "Setup database schema",
 			Action: func(c *cli.Context) error {
 				db := finance.ConnectDatabase()
+				defer db.Raw.Close()
+
 				env := &Env{db}
 				env.db.CreateTables()
 				return nil
@@ -33,7 +35,10 @@ func main() {
 				args := c.Args()
 				filePath, symbol := args.Get(0), args.Get(1)
 
-				finance.ImportStockValues(filePath, symbol)
+				db := finance.ConnectDatabase()
+				defer db.Raw.Close()
+
+				finance.ImportStockValues(db, filePath, symbol)
 				return nil
 			},
 		},
