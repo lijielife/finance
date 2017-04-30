@@ -35,7 +35,9 @@ before_script:
 
 script:
   - py.test -v tests --cov finance --cov-report term-missing
-  - cd goport && go test finance -v
+  - cd goport
+  - go test finance -run 'CreateTables'
+  - go test finance -v
 
 after_success:
   - coveralls
