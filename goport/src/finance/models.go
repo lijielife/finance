@@ -169,7 +169,6 @@ func (db *DB) GetAssetByName(name string) (Asset, error) {
 	var asset Asset
 	var err error
 
-	// FIXME: Deal with cases where no matching record found
 	db.Raw.First(&asset, "name = ?", name)
 	if asset == (Asset{}) {
 		// err = &RowNotFoundError{fmt.Sprintf("Account '%s' not found", name)}
@@ -184,7 +183,6 @@ func (db *DB) GetAccountByName(name string) (Account, error) {
 	var account Account
 	var err error
 
-	// FIXME: Deal with cases where no matching record found
 	db.Raw.First(&account, "name = ?", name)
 	if account == (Account{}) {
 		// err = &RowNotFoundError{fmt.Sprintf("Account '%s' not found", name)}
