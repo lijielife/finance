@@ -87,6 +87,8 @@ type Account struct {
 type Asset struct {
 	ID          uint64 `sql:"AUTO_INCREMENT" gorm:"primary_key"`
 	Name        string `sql:"type:varchar(255);" gorm:"unique_index"`
+	Symbol      string `sql:"type:varchar(255);" gorm:"unique_index"` // e.g., AMZN, NVDA, etc.
+	ISIN        string `sql:"type:varchar(255);" gorm:"unique_index"` // International Securities Identification Number
 	Description string
 }
 
