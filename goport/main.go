@@ -3,9 +3,10 @@ package main
 import (
 	"finance"
 	"fmt"
-	"github.com/urfave/cli"
 	"net/http"
 	"os"
+
+	"github.com/urfave/cli"
 )
 
 type Env struct {
@@ -24,6 +25,25 @@ func main() {
 
 				env := &Env{db}
 				env.db.CreateTables()
+				return nil
+			},
+		},
+		{
+			Name:  "get_asset",
+			Usage: "Get asset information",
+			Action: func(c *cli.Context) error {
+				args := c.Args()
+				symbol := args.Get(0)
+
+				db := finance.ConnectDatabase()
+				defer db.Raw.Close()
+
+				asset, err := db.GetAssetBySymbol(symbol)
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					fmt.Println(asset)
+				}
 				return nil
 			},
 		},

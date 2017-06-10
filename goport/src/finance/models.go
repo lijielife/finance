@@ -4,15 +4,17 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"os"
 	"time"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type Datastore interface {
 	CreateTables()
-	GetAssetByName(name string) Asset
+	GetAssetByName(name string) (Asset, error)
+	GetAssetBySymbol(symbol string) (Asset, error)
 	InsertAsset(name string, description string) (Asset, []error)
 }
 
@@ -164,6 +166,21 @@ func (db *DB) CreateTables() {
 // A wrapper for `gorm.DB` object.
 type DB struct {
 	Raw *gorm.DB
+}
+
+// GetAssetBySymbol returns an `Asset` instance matching the given symbol.
+func (db *DB) GetAssetBySymbol(symbol string) (Asset, error) {
+	var asset Asset
+	var err error
+
+	db.Raw.First(&asset, "symbol = ?", symbol)
+	if asset == (Asset{}) {
+		// err = &RowNotFoundError{fmt.Sprintf("Account '%s' not found", name)}
+		err = fmt.Errorf("Asset '%s' not found", symbol)
+	} else {
+		err = nil
+	}
+	return asset, err
 }
 
 // Returns an `Asset` instance matching the given name.
