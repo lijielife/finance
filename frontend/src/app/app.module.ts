@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
+import { AssetTimelineComponent } from './asset-timeline.component';
 import { DartListComponent } from './dart-list.component';
 import { DartViewComponent } from './dart-view.component';
 import { DartService } from './dart.service';
@@ -18,6 +19,10 @@ import { PortfolioService } from './portfolio.service';
         FormsModule,
         HttpModule,
         RouterModule.forRoot([
+            {
+                path: 'asset/code/:code/timeline',
+                component: AssetTimelineComponent
+            },
             {
                 path: 'dart',
                 component: DartListComponent
@@ -38,6 +43,7 @@ import { PortfolioService } from './portfolio.service';
     ],
     declarations: [
         AppComponent,
+        AssetTimelineComponent,
         DartListComponent,
         DartViewComponent,
         PortfolioListComponent,
