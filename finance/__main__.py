@@ -87,6 +87,14 @@ def drop_all():
 
 
 @cli.command()
+@click.argument('code')
+def get_asset(code):
+    with create_app(__name__).app_context():
+        asset = Asset.get_by_symbol(code)
+        print(asset)
+
+
+@cli.command()
 def insert_test_data():
     app = create_app(__name__)
     with app.app_context():
