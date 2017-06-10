@@ -249,9 +249,9 @@ def insert_asset(row, data=None):
     :param row: comma separated values
     """
     from finance.models import Asset
-    type, name, description = [x.strip() for x in row.split(',')]
+    type, code, description = [x.strip() for x in row.split(',')]
     return Asset.create(
-        type=type, name=name, description=description, data=data)
+        type=type, code=code, description=description, data=data)
 
 
 def insert_asset_value(row, asset, base_asset):

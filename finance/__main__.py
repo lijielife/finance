@@ -110,11 +110,12 @@ def insert_test_data():
         insert_asset('currency, USD, United States Dollar')
         insert_asset('commodity, Gold, Gold')
         insert_asset('security, KB S&P500,', data={'code': 'KR5223941018'})
-        insert_asset('security, 이스트스프링차이나펀드,',
+        insert_asset('security,,이스트스프링차이나펀드',
                      data={'code': 'KR5229221225'})
-        insert_asset('security, 키움일본인덱스,',
+        insert_asset('security,,키움일본인덱스',
                      data={'code': 'KR5206689717'})
-        insert_asset('bond, 포트폴리오 투자상품 1호,')
+        insert_asset('bond,,포트폴리오 투자상품 1호')
+        insert_asset('stock, NVDA,')
 
         portfolio = Portfolio()
         portfolio.base_asset = asset_krw
